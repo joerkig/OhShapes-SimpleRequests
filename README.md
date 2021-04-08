@@ -1,11 +1,11 @@
-# Twitch Chatbot Python Sample
-Here you will find a simple Python chatbot using IRC that can help demonstrate how to interact with chat on Twitch.
+# Twitch Simple OhShapes Requests
+Here you will find a simple Python chatbot using IRC adapted to make requests from Twitch chat possible.
 
 ## Installation
 After you have cloned this repository, use pip or easy_install to install the IRC library.
 
 ```sh
-$ pip install irc
+$ pip install -r requirements.txt
 ```
 
 ## Usage
@@ -19,5 +19,7 @@ $ python chatbot.py <username> <client id> <token> <channel>
 * Token - Your OAuth Token
 * Channel - The channel your bot will connect to
 
-## Next Steps
-Feel free to augment the chatbot with your own new commands by adding them in the do_command() function. 
+## Wishlist
+* Ability to block maps
+* An actual queue of some kind
+* Store previously downloaded maps and use them when available
