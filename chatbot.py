@@ -76,13 +76,20 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
                 r = requests.get(url, headers=headers).json()
                 c.privmsg(self.channel, r['display_name'] + ' channel title is currently ' + r['status'])
 
-            # Provide basic information to viewers for specific commands
+            # Responds with most recently uploaded map
             elif cmd == "oslatest":
                 url = 'http://ohshapes.com/api/maps/latest/0?'
                 r = requests.get(url).json()
                 c.privmsg(self.channel, 'Most recently uploaded was ' + r['docs'][0]['metadata']['songName'] + ' by ' + r['docs'][0]['metadata']['songAuthorName'] + ' uploaded by ' + r['docs'][0]['uploader']['username'] )
+            # Request a map from http://OhShapes.com and put it in current directory
             elif cmd == "osr":  
                 if arg1 == None:   
+                    c.privmsg(self.channel, howto)
+                elif arg1 == "?":
+                    c.privmsg(self.channel, howto)
+                elif arg1 == "help"
+                    c.privmsg(self.channel, howto)
+                elif arg1 == "howto"
                     c.privmsg(self.channel, howto)
                 else:
                     url = 'http://ohshapes.com/api/maps/detail/'
