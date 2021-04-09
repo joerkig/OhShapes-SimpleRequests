@@ -20,6 +20,7 @@ $ python chatbot.py <username> <client id> <token> <channel>
 * Channel - The channel your bot will connect to
 
 ## Wishlist
+List of things I want to add at some point.
 * Ability to block maps
 * An actual queue of some kind
 * Store previously downloaded maps and use them when available
