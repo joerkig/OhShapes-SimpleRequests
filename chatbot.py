@@ -87,9 +87,9 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
                     c.privmsg(self.channel, howto)
                 elif arg1 == "?":
                     c.privmsg(self.channel, howto)
-                elif arg1 == "help"
+                elif arg1 == "help":
                     c.privmsg(self.channel, howto)
-                elif arg1 == "howto"
+                elif arg1 == "howto":
                     c.privmsg(self.channel, howto)
                 else:
                     url = 'http://ohshapes.com/api/maps/detail/'
@@ -110,7 +110,12 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
                         print("File already exists")
                     except ValueError:
                         c.privmsg(self.channel, notfound)
-
+            # WIP Block a map from being requested
+            elif cmd == "block":
+                if arg1 == None:
+                    c.privmsg(self.channel, 'Specify a key to block')
+                else:
+                    c.privmsg(self.channel, arg1 + 'has been blocked')
                 # The command was not recognized
             else:
                 print("Did not understand command: " + cmd)
