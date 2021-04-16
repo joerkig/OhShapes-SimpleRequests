@@ -95,15 +95,18 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
                     url = 'http://ohshapes.com/api/maps/detail/'
                     try:
                         r = requests.get(url + arg1).json()
+
                         if len(str(r['stats']['rating'])[2:4]) == 1:
                             rating = str(r['stats']['rating'])[2:4] + "0"
                         else:
                             rating = str(r['stats']['rating'])[2:4]
                         c.privmsg(self.channel, r['metadata']['songName'] + ' ' + str(rating) + '% (' + r['key'] + ') was added to requests.')
+                        # Downloading map
                         url2 = 'http://ohshapes.com'
                         r2 = requests.get(url2 + r['directDownload'])
                         open(r['key'] + ' - ' + re.sub('[^A-z0-9 ]+', '', r['metadata']['levelAuthorName']) + ' - ' + re.sub('[^A-z0-9 ]+', '', r['metadata']['songName']) + '.zip' , 'xb').write(r2.content)
                         os.mkdir(os.getcwd() + '\\' + r['key'] + ' - ' + re.sub('[^A-z0-9 ]+', '', r['metadata']['levelAuthorName']) + ' - ' + re.sub('[^A-z0-9 ]+', '', r['metadata']['songName']) + '\\')
+                        # Unzipping
                         zip = zipfile.ZipFile(r['key'] + ' - ' + re.sub('[^A-z0-9 ]+', '', r['metadata']['levelAuthorName']) + ' - ' + re.sub('[^A-z0-9 ]+', '', r['metadata']['songName']) + '.zip')
                         zip.extractall(os.getcwd() + '\\' + r['key'] + ' - ' + re.sub('[^A-z0-9 ]+', '', r['metadata']['levelAuthorName']) + ' - ' + re.sub('[^A-z0-9 ]+', '', r['metadata']['songName']) + '\\')
                     except FileExistsError:
