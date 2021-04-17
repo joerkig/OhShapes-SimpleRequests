@@ -192,6 +192,8 @@ def main():
     if len(sys.argv) != 5:
         print("Usage: twitchbot <username> <client id> <token> <channel>")
         sys.exit(1)
+    if os.path.exists('blocklist.txt') == False :
+        open('blocklist.txt', 'a').close()
 
     username  = sys.argv[1]
     client_id = sys.argv[2]
