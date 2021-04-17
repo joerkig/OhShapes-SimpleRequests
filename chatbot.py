@@ -132,7 +132,7 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
                     except ValueError:
                         c.privmsg(self.channel, notfound)
             
-            # WIP Block a map from being requested (This is probably allowing anyone to block)
+            # Block a map from being requested
             elif cmd == "block":
                 if self.channel[1:] == sender or mod == 1 :
                     if arg1 == None:
@@ -154,7 +154,8 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
                             c.privmsg(self.channel, arg1 + ' has been blocked')
                 else:
                     c.privmsg(self.channel, 'Only mods can block')
-                # The command was not recognized
+                
+            # Unblock a map so it can be requested again
             elif cmd == "unblock":
                 if self.channel[1:] == sender or mod == 1 :
                     with open('blocklist.txt') as f:
@@ -181,6 +182,7 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
                         c.privmsg(self.channel, arg1 + ' was not blocked')
                 else:
                     c.privmsg(self.channel, 'Only mods can unblock')
+            # The command was not recognized
             else:
                 print("Did not understand command: " + cmd + " " + arg1 )
         except:
