@@ -46,17 +46,27 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
     def on_pubmsg(self, c, e):
 
         # If a chat message starts with an exclamation point, try to run it as a command
+        print (e)
+        print (e.arguments[0])
         if e.arguments[0][:1] == '!':
             cmd = e.arguments[0].split(' ')[0][1:]
             try:
                 arg1 = e.arguments[0].split(' ')[1][0:]
             except IndexError:
                 arg1 = None
+            try:
+                sender = e.source.split('!')[0]
+            except IndexError:
+                sender = None
+            try:
+                mod = e.tags[8]['value']
+            except IndexError:
+                mod = None
             print ('Received command: ' + cmd)
-            self.do_command(e, cmd, arg1)
+            self.do_command(e, cmd, arg1, sender, mod)
         return
 
-    def do_command(self, e, cmd, arg1):
+    def do_command(self, e, cmd, arg1, sender, mod):
         try:
             c = self.connection
             howto = "To request a map find the key of it on http://ohshapes.com and put it behind this command"   
@@ -124,7 +134,7 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
             
             # WIP Block a map from being requested (This is probably allowing anyone to block)
             elif cmd == "block":
-                if self.channel[1:] == self._nickname:
+                if self.channel[1:] == sender or mod == 1 :
                     if arg1 == None:
                         c.privmsg(self.channel, 'Specify a key to block')
                     else:
@@ -137,38 +147,40 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
                             with open("blocklist.txt", "a+") as file_object:
                                 # Move read cursor to the start of file.
                                 file_object.seek(0)
-                                # If file is not empty then append '\n'
                                 data = file_object.read(100)
                                 # Append text at the end of file
                                 file_object.write(arg1)
                                 file_object.write("\n")
                             c.privmsg(self.channel, arg1 + ' has been blocked')
                 else:
-                    c.privmsg(self.channel, 'Only the streamer can block')
+                    c.privmsg(self.channel, 'Only mods can block')
                 # The command was not recognized
             elif cmd == "unblock":
-                with open('blocklist.txt') as f:
-                    blocked = [line.rstrip() for line in f]
-                if arg1 == None:
-                    c.privmsg(self.channel, 'Specify a key to block')
-                elif arg1 in blocked :
-                    #read input file
-                    fin = open("blocklist.txt", "rt")
-                    #read file contents to string
-                    data = fin.read()
-                    #replace all occurrences of the required string
-                    data = data.replace(arg1 + "\n" , '')
-                    #close the input file
-                    fin.close()
-                    #open the input file in write mode
-                    fin = open("blocklist.txt", "wt")
-                    #overrite the input file with the resulting data
-                    fin.write(data)
-                    #close the file
-                    fin.close()
-                    c.privmsg(self.channel, arg1 + ' in now unblocked')
+                if self.channel[1:] == sender or mod == 1 :
+                    with open('blocklist.txt') as f:
+                        blocked = [line.rstrip() for line in f]
+                    if arg1 == None:
+                        c.privmsg(self.channel, 'Specify a key to block')
+                    elif arg1 in blocked :
+                        #read input file
+                        fin = open("blocklist.txt", "rt")
+                        #read file contents to string
+                        data = fin.read()
+                        #replace all occurrences of the required string
+                        data = data.replace(arg1 + "\n" , '')
+                        #close the input file
+                        fin.close()
+                        #open the input file in write mode
+                        fin = open("blocklist.txt", "wt")
+                        #overrite the input file with the resulting data
+                        fin.write(data)
+                        #close the file
+                        fin.close()
+                        c.privmsg(self.channel, arg1 + ' in now unblocked')
+                    else:
+                        c.privmsg(self.channel, arg1 + ' was not blocked')
                 else:
-                    c.privmsg(self.channel, arg1 + ' was not blocked')
+                    c.privmsg(self.channel, 'Only mods can unblock')
             else:
                 print("Did not understand command: " + cmd + " " + arg1 )
         except:
