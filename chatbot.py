@@ -81,6 +81,7 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
                 url = 'http://ohshapes.com/api/maps/latest/0?'
                 r = requests.get(url).json()
                 c.privmsg(self.channel, 'Most recently uploaded was ' + r['docs'][0]['metadata']['songName'] + ' by ' + r['docs'][0]['metadata']['songAuthorName'] + ' uploaded by ' + r['docs'][0]['uploader']['username'] )
+            
             # Request a map from http://OhShapes.com and put it in current directory
             elif cmd == "osr":  
                 if arg1 == None:   
@@ -94,34 +95,82 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
                 else:
                     url = 'http://ohshapes.com/api/maps/detail/'
                     try:
-                        r = requests.get(url + arg1).json()
-
-                        if len(str(r['stats']['rating'])[2:4]) == 1:
-                            rating = str(r['stats']['rating'])[2:4] + "0"
+                        with open('blocklist.txt') as f:
+                            blocked = [line.rstrip() for line in f]
+                        if arg1 in blocked :
+                            c.privmsg(self.channel, arg1 + ' was blocked')
                         else:
-                            rating = str(r['stats']['rating'])[2:4]
-                        c.privmsg(self.channel, r['metadata']['songName'] + ' ' + str(rating) + '% (' + r['key'] + ') was added to requests.')
-                        # Downloading map
-                        url2 = 'http://ohshapes.com'
-                        r2 = requests.get(url2 + r['directDownload'])
-                        open(r['key'] + ' - ' + re.sub('[^A-z0-9 ]+', '', r['metadata']['levelAuthorName']) + ' - ' + re.sub('[^A-z0-9 ]+', '', r['metadata']['songName']) + '.zip' , 'xb').write(r2.content)
-                        os.mkdir(os.getcwd() + '\\' + r['key'] + ' - ' + re.sub('[^A-z0-9 ]+', '', r['metadata']['levelAuthorName']) + ' - ' + re.sub('[^A-z0-9 ]+', '', r['metadata']['songName']) + '\\')
-                        # Unzipping
-                        zip = zipfile.ZipFile(r['key'] + ' - ' + re.sub('[^A-z0-9 ]+', '', r['metadata']['levelAuthorName']) + ' - ' + re.sub('[^A-z0-9 ]+', '', r['metadata']['songName']) + '.zip')
-                        zip.extractall(os.getcwd() + '\\' + r['key'] + ' - ' + re.sub('[^A-z0-9 ]+', '', r['metadata']['levelAuthorName']) + ' - ' + re.sub('[^A-z0-9 ]+', '', r['metadata']['songName']) + '\\')
+                            r = requests.get(url + arg1).json()
+
+                            if len(str(r['stats']['rating'])[2:4]) == 1:
+                                rating = str(r['stats']['rating'])[2:4] + "0"
+                            else:
+                                rating = str(r['stats']['rating'])[2:4]
+                            c.privmsg(self.channel, r['metadata']['songName'] + ' ' + str(rating) + '% (' + r['key'] + ') was added to requests.')
+                            
+                            # Downloading map
+                            url2 = 'http://ohshapes.com'
+                            r2 = requests.get(url2 + r['directDownload'])
+                            open(r['key'] + ' (' + re.sub('[^A-z0-9 ]+', '', r['metadata']['songName']) + ' - ' + re.sub('[^A-z0-9 ]+', '', r['metadata']['levelAuthorName']) + ')' + '.zip' , 'xb').write(r2.content)
+                            os.mkdir(os.getcwd() + '\\' + r['key'] + ' (' + re.sub('[^A-z0-9 ]+', '', r['metadata']['songName']) + ' - ' + re.sub('[^A-z0-9 ]+', '', r['metadata']['levelAuthorName']) + ')' + '\\')
+                            
+                            # Unzipping
+                            zip = zipfile.ZipFile(r['key'] + ' (' + re.sub('[^A-z0-9 ]+', '', r['metadata']['songName']) + ' - ' + re.sub('[^A-z0-9 ]+', '', r['metadata']['levelAuthorName']) + ')' + '.zip')
+                            zip.extractall(os.getcwd() + '\\' + r['key'] + ' (' + re.sub('[^A-z0-9 ]+', '', r['metadata']['songName']) + ' - ' + re.sub('[^A-z0-9 ]+', '', r['metadata']['levelAuthorName']) + ')' + '\\')
                     except FileExistsError:
                         print("File already exists")
                     except ValueError:
                         c.privmsg(self.channel, notfound)
-            # WIP Block a map from being requested
+            
+            # WIP Block a map from being requested (This is probably allowing anyone to block)
             elif cmd == "block":
+                if self.channel[1:] == self._nickname:
+                    if arg1 == None:
+                        c.privmsg(self.channel, 'Specify a key to block')
+                    else:
+                        # Open the file in append & read mode ('a+')
+                        with open('blocklist.txt') as f:
+                            blocked = [line.rstrip() for line in f]
+                        if arg1 in blocked :
+                            c.privmsg(self.channel, arg1 + ' is already blocked')
+                        else:
+                            with open("blocklist.txt", "a+") as file_object:
+                                # Move read cursor to the start of file.
+                                file_object.seek(0)
+                                # If file is not empty then append '\n'
+                                data = file_object.read(100)
+                                # Append text at the end of file
+                                file_object.write(arg1)
+                                file_object.write("\n")
+                            c.privmsg(self.channel, arg1 + ' has been blocked')
+                else:
+                    c.privmsg(self.channel, 'Only the streamer can block')
+                # The command was not recognized
+            elif cmd == "unblock":
+                with open('blocklist.txt') as f:
+                    blocked = [line.rstrip() for line in f]
                 if arg1 == None:
                     c.privmsg(self.channel, 'Specify a key to block')
+                elif arg1 in blocked :
+                    #read input file
+                    fin = open("blocklist.txt", "rt")
+                    #read file contents to string
+                    data = fin.read()
+                    #replace all occurrences of the required string
+                    data = data.replace(arg1 + "\n" , '')
+                    #close the input file
+                    fin.close()
+                    #open the input file in write mode
+                    fin = open("blocklist.txt", "wt")
+                    #overrite the input file with the resulting data
+                    fin.write(data)
+                    #close the file
+                    fin.close()
+                    c.privmsg(self.channel, arg1 + ' in now unblocked')
                 else:
-                    c.privmsg(self.channel, arg1 + 'has been blocked')
-                # The command was not recognized
+                    c.privmsg(self.channel, arg1 + ' was not blocked')
             else:
-                print("Did not understand command: " + cmd)
+                print("Did not understand command: " + cmd + " " + arg1 )
         except:
             c.privmsg(self.channel, 'Something went wrong, please contact joerkig#1337 on Discord')
 
