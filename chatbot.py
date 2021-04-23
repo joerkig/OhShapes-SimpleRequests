@@ -90,7 +90,7 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
             elif cmd == "oslatest":
                 url = 'http://ohshapes.com/api/maps/latest/0?'
                 r = requests.get(url).json()
-                c.privmsg(self.channel, 'Most recently uploaded was ' + r['docs'][0]['metadata']['songName'] + ' by ' + r['docs'][0]['metadata']['songAuthorName'] + ' uploaded by ' + r['docs'][0]['uploader']['username'] )
+                c.privmsg(self.channel, 'Most recently uploaded was ' + r['docs'][0]['metadata']['songName'] + ' by ' + r['docs'][0]['metadata']['songAuthorName'] + ' uploaded by ' + r['docs'][0]['uploader']['username'] + " (" + r['docs'][0]['key'] + ")" )
             
             # Request a map from http://OhShapes.com and put it in current directory
             elif cmd == "osr":  
@@ -134,7 +134,7 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
             
             # Block a map from being requested
             elif cmd == "block":
-                if self.channel[1:] == sender or mod == 1 :
+                if self.channel[1:] == sender or mod == "1" :
                     if arg1 == None:
                         c.privmsg(self.channel, 'Specify a key to block')
                     else:
