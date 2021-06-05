@@ -72,22 +72,22 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
             howto = "To request a map find the key of it on http://ohshapes.com and put it behind this command"   
             notfound = "A map with that key was not found, recheck key on http://ohshapes.com"
             
-            # Poll the API to get current game.
-            if cmd == "game":
-                url = 'https://api.twitch.tv/kraken/channels/' + self.channel_id
-                headers = {'Client-ID': self.client_id, 'Accept': 'application/vnd.twitchtv.v5+json'}
-                r = requests.get(url, headers=headers).json()
-                c.privmsg(self.channel, r['display_name'] + ' is currently playing ' + r['game'])
-
-            # Poll the API the get the current status of the stream
-            elif cmd == "title":
-                url = 'https://api.twitch.tv/kraken/channels/' + self.channel_id
-                headers = {'Client-ID': self.client_id, 'Accept': 'application/vnd.twitchtv.v5+json'}
-                r = requests.get(url, headers=headers).json()
-                c.privmsg(self.channel, r['display_name'] + ' channel title is currently ' + r['status'])
-
+#            # Poll the API to get current game.
+#            if cmd == "game":
+#                url = 'https://api.twitch.tv/kraken/channels/' + self.channel_id
+#                headers = {'Client-ID': self.client_id, 'Accept': 'application/vnd.twitchtv.v5+json'}
+#                r = requests.get(url, headers=headers).json()
+#                c.privmsg(self.channel, r['display_name'] + ' is currently playing ' + r['game'])
+#
+#            # Poll the API the get the current status of the stream
+#            elif cmd == "title":
+#                url = 'https://api.twitch.tv/kraken/channels/' + self.channel_id
+#                headers = {'Client-ID': self.client_id, 'Accept': 'application/vnd.twitchtv.v5+json'}
+#                r = requests.get(url, headers=headers).json()
+#                c.privmsg(self.channel, r['display_name'] + ' channel title is currently ' + r['status'])
+#
             # Responds with most recently uploaded map
-            elif cmd == "oslatest":
+            if cmd == "oslatest":
                 url = 'http://ohshapes.com/api/maps/latest/0?'
                 r = requests.get(url).json()
                 c.privmsg(self.channel, 'Most recently uploaded was ' + r['docs'][0]['metadata']['songName'] + ' by ' + r['docs'][0]['metadata']['songAuthorName'] + ' uploaded by ' + r['docs'][0]['uploader']['username'] + " (" + r['docs'][0]['key'] + ")" )
